@@ -4,6 +4,9 @@ from app.database.session import SessionLocal
 from app.models.user import User
 from app.core.security import hash_password, verify_password, create_token
 from app.schemas.auth import RegisterSchema, LoginSchema
+from app.core.security import get_password_hash 
+from app.core.security import verify_password, create_access_token
+
 
 router = APIRouter()
 
@@ -34,3 +37,11 @@ def login(data: LoginSchema, db: Session = Depends(get_db)):
 
     token = create_token({"user_id": user.id})
     return {"access_token": token}
+
+hashed_password = get_password_hash(user.password)
+
+db_user = User(
+    email=user.email,
+    password=hashed_password
+)
+
