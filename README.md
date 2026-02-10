@@ -26,3 +26,42 @@ Este repositório contém o **MVP do backend**, desenvolvido com **FastAPI**, se
 
 ## 🏗️ Arquitetura do projeto
 
+backend/
+├── app/
+│ ├── api/
+│ │ └── v1/
+│ │ ├── auth.py
+│ │ ├── rides.py
+│ │ └── router.py
+│ ├── core/
+│ │ ├── config.py
+│ │ └── security.py
+│ ├── database/
+│ │ ├── base.py
+│ │ ├── init_db.py
+│ │ └── session.py
+│ ├── models/
+│ │ ├── user.py
+│ │ ├── driver.py
+│ │ └── ride.py
+│ ├── schemas/
+│ │ ├── auth.py
+│ │ └── ride.py
+│ ├── services/
+│ │ └── pricing.py
+│ └── main.py
+│
+├── ridejusto.db
+└── venv/
+
+
+---
+
+## 🚀 Como rodar o projeto
+
+### 1️⃣ Ativar o ambiente virtual
+```bash
+venv\Scripts\activate
+
+2️⃣ Rodar o servidor
+uvicorn app.main:app --reload
