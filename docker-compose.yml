@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  db:
+    image: postgres:16-alpine
+    container_name: ridejusto-db
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-ridejusto}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ridejusto123}
+      POSTGRES_DB: ${POSTGRES_DB:-ridejusto_db}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ridejusto}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - ridejusto-network
+    restart: unless-stopped
+
+  # FastAPI Backend
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ridejusto-backend
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-ridejusto}:${POSTGRES_PASSWORD:-ridejusto123}@db:5432/${POSTGRES_DB:-ridejusto_db}
+      SECRET_KEY: ${SECRET_KEY:-ridejusto-secret-key-change-in-production}
+      ALGORITHM: ${ALGORITHM:-HS256}
+    ports:
+      - "${API_PORT:-8000}:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app/backend
+    networks:
+      - ridejusto-network
+    restart: unless-stopped
+    command: uvicorn backend.app.main:app --host 0.0.0.0 --port 8000 --reload
+
+volumes:
+  postgres_data:
+
+networks:
+  ridejusto-network:
+    driver: bridge
